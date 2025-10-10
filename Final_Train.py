@@ -165,113 +165,119 @@ for t in [1,5]:
     
     # Load and evaluate model
     #model
-    i = 1
-    if i == 1:
-        inputs = layers.Input(shape=(win, length))
-        x = layers.Reshape((win * length,))(inputs)
-        outputs = layers.Dense(1, activation='linear')(x)
-
-        model = Model(inputs=inputs, outputs=outputs)
-        model.summary()
-
-        model.compile(
-            optimizer = keras.optimizers.Adam(learning_rate=0.0001),
-            #loss = keras.losses.Huber(5),  #6,7,8,9
-            loss = 'mse',
-            metrics = [keras.metrics.RootMeanSquaredError()]
-        )
-
-        #run model
-        early_stop = keras.callbacks.EarlyStopping(
-            monitor = "val_loss",
-            patience = 3,
-            restore_best_weights = True
-        )
-
-        history = model.fit(
-        train_data,
-        epochs = 40,
-        validation_data = val_data,
-        callbacks = [early_stop],
-        verbose = 1
-        )
-
-    elif i==2:
-        F = 20
-        U = 30
-        K2 = 7
-        K3 = 10
-        inputs = layers.Input(shape=(win, length))
-
-        x2 = layers.Conv1D(F, kernel_size=K2, strides=2, activation='relu')(inputs)
-        x2 = layers.Conv1D(F, kernel_size=K2, strides=2, activation='relu')(x2)
-        x2 = layers.Conv1D(2*F, kernel_size=2*K2, strides=4, activation='relu')(x2)
-        x2 = layers.GlobalAveragePooling1D()(x2)
-
-        x3 = layers.Conv1D(F, kernel_size=K3, strides=2, activation='relu')(inputs)
-        x3 = layers.Conv1D(F, kernel_size=K3, strides=2, activation='relu')(x3)
-        x3 = layers.Conv1D(2*F, kernel_size=2*K3, strides=4, activation='relu')(x3)
-        x3 = layers.GlobalAveragePooling1D()(x3)
-
-        x = layers.Concatenate()([x2, x3])
-
-        x = layers.Dense(U, activation='relu')(x)
-        outputs = layers.Dense(1, activation='linear')(x)
-
-        model = Model(inputs=inputs, outputs=outputs)
-
-        model.summary()
-
-        model.compile(
-            optimizer = keras.optimizers.Adam(learning_rate=0.0007),
-            #loss = keras.losses.Huber(5),  #6,7,8,9
-            loss = 'mse',
-            metrics = [keras.metrics.RootMeanSquaredError()]
-        )
-
-        #run model
-        early_stop = keras.callbacks.EarlyStopping(
-            monitor = "val_loss",
-            patience = 3,
-            restore_best_weights = True
-        )
-
-        history = model.fit(
-        train_data,
-        epochs = 40,
-        validation_data = val_data,
-        callbacks = [early_stop],
-        verbose = 1
-        )
-
-    predictions1 = model.predict(val_data).flatten()
-    predictions1 = predictions1 * b + a
-
-    rmse1 = np.sqrt(np.mean((yv - predictions1) ** 2))
-    print(model.evaluate(val_data))
-    print(f"RMSE: {rmse1:.2f}")
-
-    # Compute correlation coefficient using numpy
-    corr_matrix = np.corrcoef(yv, predictions1)
-    corr_coef = corr_matrix[0, 1]
-    print(corr_coef)
-    # Plot
-    fig, ax = plt.subplots(dpi=200)
-    ax.scatter(yv, predictions1, s=2)
-    ax.set_ylabel('Predicted Dst (nT)')
-    ax.set_xlabel('Observed Dst (nT)')
-
-    min_val = min(min(yv), min(predictions1))
-    max_val = max(max(yv), max(predictions1))
-    pad = (max_val - min_val) * 0.05
-    ax.set_xlim(min_val - pad, max_val + pad)
-    ax.set_ylim(min_val - pad, max_val + pad)
-    ax.set_aspect('equal', adjustable='box')
-
-    # Identity line
-    ax.plot([min_val, max_val], [min_val, max_val], color='red', linestyle='--', label='y = x')
-    ax.set_title('Linear Model Performance on Validation Data')
-    ax.legend()
-    #fig.savefig('linear')
-    model.save('final_Linear_' + str(t) + '.keras')
-    plt.show()
+    for i in range(2): #0 for linear, 1 for cnn
+        if i == 0:
+            inputs = layers.Input(shape=(win, length))
+            x = layers.Reshape((win * length,))(inputs)
+            outputs = layers.Dense(1, activation='linear')(x)
+    
+            model = Model(inputs=inputs, outputs=outputs)
+            model.summary()
+    
+            model.compile(
+                optimizer = keras.optimizers.Adam(learning_rate=0.0001),
+                #loss = keras.losses.Huber(5),  #6,7,8,9
+                loss = 'mse',
+                metrics = [keras.metrics.RootMeanSquaredError()]
+            )
+    
+            #run model
+            early_stop = keras.callbacks.EarlyStopping(
+                monitor = "val_loss",
+                patience = 3,
+                restore_best_weights = True
+            )
+    
+            history = model.fit(
+            train_data,
+            epochs = 40,
+            validation_data = val_data,
+            callbacks = [early_stop],
+            verbose = 1
+            )
+    
+        elif i==1:
+            F = 20
+            U = 30
+            K2 = 7
+            K3 = 10
+            inputs = layers.Input(shape=(win, length))
+    
+            x2 = layers.Conv1D(F, kernel_size=K2, strides=2, activation='relu')(inputs)
+            x2 = layers.Conv1D(F, kernel_size=K2, strides=2, activation='relu')(x2)
+            x2 = layers.Conv1D(2*F, kernel_size=2*K2, strides=4, activation='relu')(x2)
+            x2 = layers.GlobalAveragePooling1D()(x2)
+    
+            x3 = layers.Conv1D(F, kernel_size=K3, strides=2, activation='relu')(inputs)
+            x3 = layers.Conv1D(F, kernel_size=K3, strides=2, activation='relu')(x3)
+            x3 = layers.Conv1D(2*F, kernel_size=2*K3, strides=4, activation='relu')(x3)
+            x3 = layers.GlobalAveragePooling1D()(x3)
+    
+            x = layers.Concatenate()([x2, x3])
+    
+            x = layers.Dense(U, activation='relu')(x)
+            outputs = layers.Dense(1, activation='linear')(x)
+    
+            model = Model(inputs=inputs, outputs=outputs)
+    
+            model.summary()
+    
+            model.compile(
+                optimizer = keras.optimizers.Adam(learning_rate=0.0007),
+                #loss = keras.losses.Huber(5),  #6,7,8,9
+                loss = 'mse',
+                metrics = [keras.metrics.RootMeanSquaredError()]
+            )
+    
+            #run model
+            early_stop = keras.callbacks.EarlyStopping(
+                monitor = "val_loss",
+                patience = 3,
+                restore_best_weights = True
+            )
+    
+            history = model.fit(
+            train_data,
+            epochs = 40,
+            validation_data = val_data,
+            callbacks = [early_stop],
+            verbose = 1
+            )
+    
+        predictions1 = model.predict(val_data).flatten()
+        predictions1 = predictions1 * b + a
+    
+        rmse1 = np.sqrt(np.mean((yv - predictions1) ** 2))
+        print(model.evaluate(val_data))
+        print(f"RMSE: {rmse1:.2f}")
+    
+        # Compute correlation coefficient using numpy
+        corr_matrix = np.corrcoef(yv, predictions1)
+        corr_coef = corr_matrix[0, 1]
+        print(corr_coef)
+        # Plot
+        fig, ax = plt.subplots(dpi=200)
+        ax.scatter(yv, predictions1, s=2)
+        ax.set_ylabel('Predicted Dst (nT)')
+        ax.set_xlabel('Observed Dst (nT)')
+    
+        min_val = min(min(yv), min(predictions1))
+        max_val = max(max(yv), max(predictions1))
+        pad = (max_val - min_val) * 0.05
+        ax.set_xlim(min_val - pad, max_val + pad)
+        ax.set_ylim(min_val - pad, max_val + pad)
+        ax.set_aspect('equal', adjustable='box')
+    
+        # Identity line
+        ax.plot([min_val, max_val], [min_val, max_val], color='red', linestyle='--', label='y = x')
+        
+        if i == 0:
+            ax.set_title('Linear Model Performance on Validation Data')
+            ax.legend()
+            fig.savefig('Linear_' + str(t)
+            model.save('Final_Linear_' + str(t) + '.keras')
+        if i == 1:
+            ax.set_title('Non-Linear Model Performance on Validation Data')
+            ax.legend()
+            fig.savefig('Non_Linear_' + str(t))
+            model.save('Final_Non_Linear_' + str(t) + '.keras')
