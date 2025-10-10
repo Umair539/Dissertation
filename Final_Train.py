@@ -274,10 +274,11 @@ for t in [1,5]:
         if i == 0:
             ax.set_title('Linear Model Performance on Validation Data')
             ax.legend()
-            fig.savefig('Linear_' + str(t)
+            fig.savefig('Linear_' + str(t))
             model.save('Final_Linear_' + str(t) + '.keras')
         if i == 1:
             ax.set_title('Non-Linear Model Performance on Validation Data')
             ax.legend()
             fig.savefig('Non_Linear_' + str(t))
             model.save('Final_Non_Linear_' + str(t) + '.keras')
+
