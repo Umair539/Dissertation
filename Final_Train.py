@@ -211,16 +211,12 @@ for t in [1, 5]:
 
             x1 = layers.Conv1D(F, kernel_size=K1, strides=2, activation="relu")(inputs)
             x1 = layers.Conv1D(F, kernel_size=K1, strides=2, activation="relu")(x1)
-            x1 = layers.Conv1D(2 * F, kernel_size=2 * K1, strides=4, activation="relu")(
-                x1
-            )
+            x1 = layers.Conv1D(2 * F, kernel_size=2 * K1, strides=4, activation="relu")(x1)
             x1 = layers.GlobalAveragePooling1D()(x1)
 
             x2 = layers.Conv1D(F, kernel_size=K2, strides=2, activation="relu")(inputs)
             x2 = layers.Conv1D(F, kernel_size=K2, strides=2, activation="relu")(x2)
-            x2 = layers.Conv1D(2 * F, kernel_size=2 * K2, strides=4, activation="relu")(
-                x2
-            )
+            x2 = layers.Conv1D(2 * F, kernel_size=2 * K2, strides=4, activation="relu")(x2)
             x2 = layers.GlobalAveragePooling1D()(x2)
 
             x = layers.Concatenate()([x1, x2])
@@ -294,3 +290,4 @@ for t in [1, 5]:
             ax.legend()
             fig.savefig("Non_Linear_" + str(t))
             model.save("Final_Non_Linear_" + str(t) + ".keras")
+
