@@ -31,7 +31,6 @@ s["days"] = s["timedelta"].dt.days
 x = pd.merge(x, s[["period", "days", "smoothed_ssn"]], "left", ["period", "days"])
 x.drop(columns="days", inplace=True)
 
-# x = pd.merge(x, y, 'left', ['period', 'timedelta'])
 x.sort_values(["period", "timedelta"], inplace=True)
 x.reset_index(inplace=True)
 
