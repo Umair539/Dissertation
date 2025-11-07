@@ -9,3 +9,5 @@ The attached files show the final iteration of the project, which includes the p
 This project was based on the [NOAA Magnetic Forecasting Challenge hosted on the DrivenData platform](https://www.drivendata.org/competitions/73/noaa-magnetic-forecasting/)
 
 [Additional link for further information on the competition](https://doi.org/10.1029/2023SW003514)
+
+The machine learning models used in this project were implemeneted using the Keras library. This framework was learned directly from [François Chollet's *Deep Learning with Python*, Third Edition (Manning Publications)](https://www.manning.com/books/deep-learning-with-python-third-edition), the authoritative text by Keras's creator.
