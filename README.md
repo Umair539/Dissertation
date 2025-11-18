@@ -1,4 +1,4 @@
-# Dissertation
+# Predicting the Severity of Geomagnetic Storms using Machine Learning
 
 This project focused on developing and evaluating machine learning models for geomagnetic storm forecasting (Dst index) 1 and 5 hours into the future.
 
