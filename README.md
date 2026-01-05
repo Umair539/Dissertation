@@ -99,7 +99,7 @@ Both the train and test folders must be located in the same directory as the Pyt
 
 1. Run `Preprocess_Train.py` and `Preprocess_Test.py` to generate processed datasets
 
-2. Run `Final_Train.py` to train the linear and final CNN model and save the resulting `.keras` model file
+2. Run `Final_Train.py` to train the linear and final CNN model and save the resulting `.keras` model files
 
 3. Run `Test.py` to evaluate model performance using the saved linear and CNN models
 
