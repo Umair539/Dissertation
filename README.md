@@ -20,17 +20,93 @@ The target variable, the Disturbance Storm Time (Dst) index, is derived from gro
 
 ---
 
-## Models
+## Models Used
 
-Two modelling approaches are explored.
+Two modelling approaches are explored. A baseline linear regression model and a convolutional neural network model.
 
-### Baseline model
+---
 
-A linear regression model is implemented as a baseline to establish reference performance for short term Dst prediction.
+## Hyperparameter Optimization
 
-### Double branch convolutional neural network
+### 1. Initial Model
+After refining an initial CNN model, the model layout prior to hyperparamter optmisation was the following:
 
-A convolutional neural network is used to model temporal dependencies in the input time series. Initial hyperparameter optimisation revealed that two different convolutional kernel sizes performed particularly well. To exploit this observation, a double branch CNN architecture was designed where each branch learns features using different kernel sizes. The outputs of both branches are concatenated before the final prediction layer.
+| Layer No. | Layer Type | Info |
+| :--- | :--- | :--- |
+| **1** | Input | - |
+| **2** | CNN | - |
+| **3** | CNN | Same parameters as 1st CNN layer |
+| **4** | CNN | Double the parameters as previous CNN layers |
+| **5** | Global Average Pooling | - |
+| **6** | Dense | No. of units tied to final CNN layer no. of filters |
+| **7** | Output | - |
+
+This approach was taken to reduce the search space during hyperparamter optimisation.
+
+### 2. Initial Model Random Search Results (Top 10 Configurations)
+The following table summarizes the performance of the top 10 configurations during the initial hyperparameter search, evaluated by the normalised validation MSE loss.
+
+| Rank | No. of Filters | Kernel Size | Strides | Learning Rate | Val Loss |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 1 | 60 | 7 | 2 | 0.0002 | **0.83552** |
+| 2 | 80 | 7 | 2 | 0.0002 | 0.84879 |
+| 3 | 40 | 10 | 2 | 0.0004 | 0.84945 |
+| 4 | 40 | 7 | 2 | 0.0003 | 0.84977 |
+| 5 | 20 | 10 | 2 | 0.0008 | 0.85511 |
+| 6 | 100 | 7 | 2 | 0.0001 | 0.85907 |
+| 7 | 40 | 10 | 2 | 0.0005 | 0.86009 |
+| 8 | 60 | 10 | 2 | 0.0007 | 0.86739 |
+| 9 | 100 | 10 | 2 | 0.0006 | 0.87039 |
+| 10 | 20 | 10 | 2 | 0.0007 | 0.87054 |
+
+From these results it was clear that both kernel sizes of 7 and 10 were very effective, alongside a stride length of 2.
+
+### 3.  Double Branch CNN Model
+
+From the results of the initial hyperparamter optmisation, a **Double Branch CNN** model architecture was investigated. This was to allow the model to process data through the two different effective kernel sizes simultaneously.
+
+| Layer No. | Layer Type | Info |
+| :--- | :--- | :--- |
+| **1** | Input | - |
+| **2** | CNN | **Branch A:**  kernel = 7, stride = 2 <br> **Branch B:** kernel = 10, stride = 2 |
+| **3** | CNN | **Branch A:** kernel = 7, stride = 2 <br> **Branch B:** kernel = 10, stride = 2 |
+| **4** | CNN | **Branch A:** kernel = 14, stride = 4 <br> **Branch B:** kernel = 20, stride = 4 |
+| **5** | Global Average Pooling | **Branch A:** - <br> **Branch B:** -|
+| **6** | Concatenate | Combine output of both branches |
+| **7** | Dense | - |
+| **8** | Output | - |
+
+### 4. Double Branch CNN Model Random Search Results (Top 10 Configurations)
+
+The table below summarizes the top 10 configurations found during the second stage of hyperparameter optimization. The shift to a dual-branch architecture led to a significant performance improvement.
+
+| Rank | No. of Filters | Learning Rate | Val Loss |
+| :--- | :--- | :--- | :--- |
+| **1** | **20** | **0.0007** | **0.74791** |
+| 2 | 20 | 0.0006 | 0.76245 |
+| 3 | 40 | 0.0005 | 0.77597 |
+| 4 | 100 | 0.0003 | 0.78015 |
+| 5 | 20 | 0.0005 | 0.78110 |
+| 6 | 20 | 0.0009 | 0.78552 |
+| 7 | 20 | 0.0008 | 0.78562 |
+| 8 | 40 | 0.0006 | 0.78974 |
+| 9 | 100 | 0.0007 | 0.79757 |
+| 10 | 40 | 0.0009 | 0.81496 |
+
+These results showed that adopting a multi-branch model decreased the validation loss by just over 10% which is a huge gain.
+
+### 5. Final Model
+
+| Layer No. | Layer Type | Info |
+| :--- | :--- | :--- |
+| **1** | Input | - |
+| **2** | CNN | **Branch A:** filters = 20, kernel = 7, stride = 2 <br> **Branch B:** filters = 20, kernel = 10, stride = 2 |
+| **3** | CNN | **Branch A:** filters = 20, kernel = 7, stride = 2 <br> **Branch B:** filters = 20, kernel = 10, stride = 2 |
+| **4** | CNN | **Branch A:** filters = 40, kernel = 14, stride = 4 <br> **Branch B:** filters = 40, kernel = 20, stride = 4 |
+| **5** | Global Average Pooling | **Branch A:** - <br> **Branch B:** -|
+| **6** | Concatenate | Combine output of both branches |
+| **7** | Dense | 40 units |
+| **8** | Output | - |
 
 ---
 
@@ -56,6 +132,16 @@ The final linear and CNN models achieve the following performance on one hour ah
 * NOAA benchmark LSTM RMSE: **15.2 nT**
 
 This CNN model represents a clear improvement over the linear and benchmark models.
+
+### Model Accuracy Visualization
+The following scatter plot illustrates the relationship between predicted and observed Dst values. There is a clear difference between the linear and non-linear model predictions for the more intense storms which are charecterised by a more negative Dst value.
+
+
+![1 Hour Ahead Linear Model Predictions versus Observed Dst Values](./images/Linear_Model_1_Hour.png)
+*Linear model predictions versus observed Dst values on test dataset for the one-hour-ahead forecast.*
+
+![1 Hour Ahead CNN Predictions versus Observed Dst Values](./images/Non-Linear_Model_1_Hour.png)
+*Non-Linear model predictions versus observed Dst values on test dataset for the one-hour-ahead forecast.*
 
 ---
 
@@ -99,7 +185,7 @@ Both the train and test folders must be located in the same directory as the Pyt
 
 1. Run `Preprocess_Train.py` and `Preprocess_Test.py` to generate processed datasets
 
-2. Run `Final_Train.py` to train the linear and final CNN model and save the resulting `.keras` model files
+2. Run `Final_Train.py` to train the linear and final CNN model and save the resulting `.keras` model file
 
 3. Run `Test.py` to evaluate model performance using the saved linear and CNN models
 
