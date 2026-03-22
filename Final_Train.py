@@ -204,7 +204,7 @@ for t in [1, 5]:
 
         elif i == 1:
             F = 20
-            U = 30
+            U = 40
             K1 = 7
             K2 = 10
             inputs = layers.Input(shape=(win, length))
