@@ -2,7 +2,7 @@
 
 ## Project summary
 
-This project develops and evaluates machine learning models for short term forecasting of the severity of geomagnetic storms using the Disturbance Storm Time (Dst) index. A baseline linear regression model and a double branch convolutional neural network (CNN) are trained on solar wind and sunspot time series data to predict the Dst index one and five hours into the future. The final CNN model outperforms NOAA’s benchmark LSTM model.
+This project develops and evaluates machine learning models for short term forecasting of the severity of geomagnetic storms using the Disturbance Storm Time (Dst) index. A baseline linear regression model and a double branch convolutional neural network (CNN) are trained on solar wind and sunspot time series data to predict the Dst index one and five hours into the future. The final CNN model outperforms NOAA’s benchmark LSTM model on one hour ahead Dst predictions.
 
 ---
 
@@ -29,7 +29,7 @@ Two modelling approaches are explored. A baseline linear regression model and a 
 ## Hyperparameter Optimization
 
 ### 1. Initial Model
-After refining an initial CNN model, the model layout prior to hyperparamter optmisation was the following:
+After refining an initial CNN model, the model layout prior to hyperparameter optmisation was the following:
 
 | Layer No. | Layer Type | Info |
 | :--- | :--- | :--- |
@@ -41,7 +41,7 @@ After refining an initial CNN model, the model layout prior to hyperparamter opt
 | **6** | Dense | No. of units tied to final CNN layer no. of filters |
 | **7** | Output | - |
 
-This approach was taken to reduce the search space during hyperparamter optimisation.
+This approach was taken to reduce the search space during hyperparameter optimisation.
 
 ### 2. Initial Model Random Search Results (Top 10 Configurations)
 The following table summarizes the performance of the top 10 configurations during the initial hyperparameter search, evaluated by the normalised validation MSE loss.
@@ -63,7 +63,7 @@ From these results it was clear that both kernel sizes of 7 and 10 were very eff
 
 ### 3.  Double Branch CNN Model
 
-From the results of the initial hyperparamter optmisation, a **Double Branch CNN** model architecture was investigated. This was to allow the model to process data through the two different effective kernel sizes simultaneously.
+From the results of the initial hyperparameter optmisation, a **Double Branch CNN** model architecture was investigated. This was to allow the model to process data through the two different effective kernel sizes simultaneously.
 
 | Layer No. | Layer Type | Info |
 | :--- | :--- | :--- |
@@ -129,12 +129,12 @@ The final linear and CNN models achieve the following performance on one hour ah
 
 * Linear RMSE: **17.48 nT**
 * CNN RMSE: **13.71 nT**
-* NOAA benchmark LSTM RMSE: **15.2 nT**
+* NOAA benchmark LSTM RMSE: **[15.2 nT](https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2023SW003514#:~:text=Progress%20of%20the%20best%20scores%20(root%20mean%20square%20error%2C%20the%20lower%20the%20better)%20on%20public%20and%20private%20leaderboards%20over%20the%20course%20of%20the%20competition.%20Benchmark%20model%20achieved%20an%20root%20mean%20square%20error%C2%A0of%2015.2%C2%A0nT%20on%20the%20private%20leaderboard%20and%2016.3%20on%20the%20public%20leaderboard.)**
 
 This CNN model represents a clear improvement over the linear and benchmark models.
 
 ### Model Accuracy Visualization
-The following scatter plot illustrates the relationship between predicted and observed Dst values. There is a clear difference between the linear and non-linear model predictions for the more intense storms which are charecterised by a more negative Dst value.
+The following scatter plot illustrates the relationship between predicted and observed Dst values. There is a clear difference between the linear and non-linear model predictions for the more intense storms which are characterised by a more negative Dst value.
 
 
 ![1 Hour Ahead Linear Model Predictions versus Observed Dst Values](./images/Linear_Model_1_Hour.png)
