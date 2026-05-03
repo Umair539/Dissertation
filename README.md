@@ -24,6 +24,17 @@ The target variable, the Disturbance Storm Time (Dst) index, is derived from gro
 
 Two modelling approaches are explored. A baseline linear regression model and a convolutional neural network model.
 
+### Why CNN over LSTM?
+
+CNNs were selected over LSTMs based on literature demonstrating comparable 
+predictive performance at significantly lower parameter counts and training 
+times. [Li and Sun (2024)](https://ieeexplore.ieee.org/document/10934347/) 
+found that a TD-CNN trained in only 17.8% of the time required by a 
+comparable Bi-LSTM on the same Dst forecasting task. Separately, results 
+from the MagNet competition [(Licata et al., 2023)](https://doi.org/10.1029/2023SW003514) 
+show a CNN ensemble matching LSTM-GRU accuracy with less than 0.1% of the 
+parameter count (51,191 vs 60 million).
+
 ---
 
 ## Hyperparameter Optimization
